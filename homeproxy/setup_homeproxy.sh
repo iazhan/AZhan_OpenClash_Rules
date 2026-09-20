@@ -274,6 +274,51 @@ set homeproxy.rs_cnip.format='binary'
 set homeproxy.rs_cnip.url='${BASE_URL}/cnip.srs'
 EOF
 
+echo -e "[*] 正在向 /etc/config/homeproxy 写入策略组 (Routing Nodes)..."
+
+# 批量添加策略组（出站分组）
+uci batch <<EOF
+set homeproxy.rn_gemini=routing_node
+set homeproxy.rn_gemini.label='🤖 Google Gemini'
+set homeproxy.rn_gemini.enabled='1'
+set homeproxy.rn_gemini.node='default-node'
+
+set homeproxy.rn_chatgpt=routing_node
+set homeproxy.rn_chatgpt.label='🤖 OpenAI ChatGPT'
+set homeproxy.rn_chatgpt.enabled='1'
+set homeproxy.rn_chatgpt.node='default-node'
+
+set homeproxy.rn_claude=routing_node
+set homeproxy.rn_claude.label='🤖 Anthropic Claude'
+set homeproxy.rn_claude.enabled='1'
+set homeproxy.rn_claude.node='default-node'
+
+set homeproxy.rn_ai=routing_node
+set homeproxy.rn_ai.label='🤖 海外通用 AI'
+set homeproxy.rn_ai.enabled='1'
+set homeproxy.rn_ai.node='default-node'
+
+set homeproxy.rn_media=routing_node
+set homeproxy.rn_media.label='🎥 国外媒体与视频'
+set homeproxy.rn_media.enabled='1'
+set homeproxy.rn_media.node='default-node'
+
+set homeproxy.rn_social=routing_node
+set homeproxy.rn_social.label='💬 即时通讯与社交'
+set homeproxy.rn_social.enabled='1'
+set homeproxy.rn_social.node='default-node'
+
+set homeproxy.rn_github=routing_node
+set homeproxy.rn_github.label='🚀 GitHub'
+set homeproxy.rn_github.enabled='1'
+set homeproxy.rn_github.node='default-node'
+
+set homeproxy.rn_games=routing_node
+set homeproxy.rn_games.label='🕹️ 游戏平台'
+set homeproxy.rn_games.enabled='1'
+set homeproxy.rn_games.node='default-node'
+EOF
+
 echo -e "[*] 正在向 /etc/config/homeproxy 写入分流路由规则 (Routing Rules)..."
 
 # 批量添加分流路由规则（优先级自上而下）
@@ -333,7 +378,7 @@ add_list homeproxy.rr_gemini.domain_suffix='generativelanguage.googleapis.com'
 add_list homeproxy.rr_gemini.domain_suffix='makersuite.google.com'
 add_list homeproxy.rr_gemini.domain_suffix='deepmind.google'
 add_list homeproxy.rr_gemini.domain_suffix='aistudio.google.com'
-set homeproxy.rr_gemini.outbound='default-node'
+set homeproxy.rr_gemini.outbound='rn_gemini'
 
 # 6. ChatGPT 专属代理
 set homeproxy.rr_chatgpt=routing_rule
@@ -345,7 +390,7 @@ add_list homeproxy.rr_chatgpt.domain_suffix='chatgpt.com'
 add_list homeproxy.rr_chatgpt.domain_suffix='oaistatic.com'
 add_list homeproxy.rr_chatgpt.domain_suffix='oaiusercontent.com'
 add_list homeproxy.rr_chatgpt.domain_suffix='sora.com'
-set homeproxy.rr_chatgpt.outbound='default-node'
+set homeproxy.rr_chatgpt.outbound='rn_chatgpt'
 
 # 7. Claude 专属代理
 set homeproxy.rr_claude=routing_rule
@@ -354,7 +399,7 @@ set homeproxy.rr_claude.enabled='1'
 set homeproxy.rr_claude.mode='default'
 add_list homeproxy.rr_claude.domain_suffix='anthropic.com'
 add_list homeproxy.rr_claude.domain_suffix='claude.ai'
-set homeproxy.rr_claude.outbound='default-node'
+set homeproxy.rr_claude.outbound='rn_claude'
 
 # 8. 海外通用 AI
 set homeproxy.rr_ai=routing_rule
@@ -362,7 +407,7 @@ set homeproxy.rr_ai.label='8. 海外通用 AI 服务'
 set homeproxy.rr_ai.enabled='1'
 set homeproxy.rr_ai.mode='default'
 add_list homeproxy.rr_ai.rule_set='rs_ai'
-set homeproxy.rr_ai.outbound='default-node'
+set homeproxy.rr_ai.outbound='rn_ai'
 
 # 9. 油管与流媒体
 set homeproxy.rr_media=routing_rule
@@ -379,7 +424,7 @@ add_list homeproxy.rr_media.rule_set='rs_appletv'
 add_list homeproxy.rr_media.rule_set='rs_spotify'
 add_list homeproxy.rr_media.rule_set='rs_media'
 add_list homeproxy.rr_media.rule_set='rs_mediaip'
-set homeproxy.rr_media.outbound='default-node'
+set homeproxy.rr_media.outbound='rn_media'
 
 # 10. 社交与通讯 (Telegram, Twitter, WhatsApp, TikTok)
 set homeproxy.rr_social=routing_rule
@@ -393,7 +438,7 @@ add_list homeproxy.rr_social.domain_suffix='telegram.org'
 add_list homeproxy.rr_social.domain_suffix='twitter.com'
 add_list homeproxy.rr_social.domain_suffix='x.com'
 add_list homeproxy.rr_social.domain_suffix='whatsapp.com'
-set homeproxy.rr_social.outbound='default-node'
+set homeproxy.rr_social.outbound='rn_social'
 
 # 11. GitHub
 set homeproxy.rr_github=routing_rule
@@ -403,7 +448,7 @@ set homeproxy.rr_github.mode='default'
 add_list homeproxy.rr_github.domain_suffix='github.com'
 add_list homeproxy.rr_github.domain_suffix='githubassets.com'
 add_list homeproxy.rr_github.domain_suffix='githubusercontent.com'
-set homeproxy.rr_github.outbound='default-node'
+set homeproxy.rr_github.outbound='rn_github'
 
 # 12. 国内服务与 CDN 直连 (Google-CN, Apple-CN, MS-CN, Games-CN, Bilibili)
 set homeproxy.rr_cn_services=routing_rule
@@ -423,7 +468,7 @@ set homeproxy.rr_games.label='13. 游戏平台 (Steam等)'
 set homeproxy.rr_games.enabled='1'
 set homeproxy.rr_games.mode='default'
 add_list homeproxy.rr_games.rule_set='rs_games'
-set homeproxy.rr_games.outbound='default-node'
+set homeproxy.rr_games.outbound='rn_games'
 
 # 14. 测速工具
 set homeproxy.rr_speedtest=routing_rule
